@@ -34,7 +34,7 @@ func main() {
 
 	Write(c, []byte("ping"))
 
-	Communicate(c)
+	Communicate(c, Read, Write)
 }
 
 // ConnectWebsocket connect websocket
@@ -43,12 +43,12 @@ func ConnectWebsocket(ctx context.Context, url string, header http.Header) (*web
 }
 
 // Communicate ...
-func Communicate(c *websocket.Conn) {
-	msgCh := Read(c)
+func Communicate(c *websocket.Conn, read func(*websocket.Conn) <-chan []byte, write func(*websocket.Conn, []byte) error) {
+	msgCh := read(c)
 
 	go func() {
 		for t := range time.Tick(time.Second) {
-			Write(c, []byte(t.String()))
+			write(c, []byte(t.String()))
 		}
 	}()
 

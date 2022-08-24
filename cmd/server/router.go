@@ -17,9 +17,13 @@ func registerRouter(r *gin.Engine) {
 	r.GET("/ws", WSHanlder(handle))
 }
 
-var upgrader = websocket.Upgrader{}
+var upgrader = new(websocket.Upgrader)
 
 func WSHanlder(handle func([]byte) []byte) gin.HandlerFunc {
+	return WSHanlderWithUpgrader(upgrader, handle)
+}
+
+func WSHanlderWithUpgrader(upgrader *websocket.Upgrader, handle func([]byte) []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -40,6 +44,7 @@ func WSHanlder(handle func([]byte) []byte) gin.HandlerFunc {
 			}
 		}
 	}
+
 }
 
 func handle(msg []byte) []byte {
