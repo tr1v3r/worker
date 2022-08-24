@@ -14,12 +14,12 @@ func registerRouter(r *gin.Engine) {
 			"message": "pong",
 		})
 	})
-	r.GET("/ws", WSHanlder())
+	r.GET("/ws", WSHanlder(handle))
 }
 
 var upgrader = websocket.Upgrader{}
 
-func WSHanlder() gin.HandlerFunc {
+func WSHanlder(handle func([]byte) []byte) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
@@ -27,25 +27,26 @@ func WSHanlder() gin.HandlerFunc {
 		}
 		defer ws.Close()
 		for {
-			mt, message, err := ws.ReadMessage()
+			mt, msg, err := ws.ReadMessage()
 			if err != nil {
 				log.Warn("read message fail: %s", err)
 				break
 			}
 
-			var resp string
-			switch string(message) {
-			case "ping":
-				resp = "pong"
-			default:
-				resp = string(message)
-			}
-
-			err = ws.WriteMessage(mt, []byte(resp))
+			err = ws.WriteMessage(mt, handle(msg))
 			if err != nil {
 				log.Warn("write message fail: %s", err)
 				break
 			}
 		}
+	}
+}
+
+func handle(msg []byte) []byte {
+	switch string(msg) {
+	case "ping":
+		return []byte("pong")
+	default:
+		return msg
 	}
 }
