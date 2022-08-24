@@ -1,4 +1,3 @@
-// Package main provides ...
 package main
 
 import (
@@ -9,15 +8,13 @@ import (
 	"github.com/riverchu/pkg/log"
 )
 
-func main() {
-	r := gin.Default()
+func registerRouter(r *gin.Engine) {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
 	r.GET("/ws", WSHanlder())
-	r.Run(":6789")
 }
 
 var upgrader = websocket.Upgrader{}
