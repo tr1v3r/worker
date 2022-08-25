@@ -1,4 +1,4 @@
-package service
+package web
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 	"github.com/riverchu/worker/config"
 )
 
-func WebServe() {
+func Serve() {
 	r := gin.Default()
 
 	registerRouter(r)

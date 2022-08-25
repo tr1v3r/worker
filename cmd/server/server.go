@@ -1,8 +1,8 @@
 // Package main server
 package main
 
-import "github.com/riverchu/worker/biz/service"
+import "github.com/riverchu/worker/biz/service/web"
 
 func main() {
-	service.WebServe()
+	web.Serve()
 }

@@ -16,13 +16,17 @@ func WSHandle(msg []byte) []byte {
 		return msg
 	}
 
-	var cmd base.Command
-	err := json.Unmarshal(msg, &cmd)
+	var cmd = new(base.Command)
+	err := json.Unmarshal(msg, cmd)
 	if err != nil {
 		log.Error("unmarshal command fail: %s", err)
 		return []byte("unmarshal command fail")
 	}
 
+	return CommandExec(cmd)
+}
+
+func CommandExec(cmd *base.Command) []byte {
 	c := exec.Command(cmd.Cmd, cmd.Args...)
 	result, err := c.CombinedOutput()
 	if err != nil {

@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/riverchu/pkg/log"
 	ws "github.com/riverchu/pkg/websocket"
 
+	"github.com/riverchu/worker/base"
 	"github.com/riverchu/worker/config"
 )
 
@@ -23,11 +26,14 @@ func main() {
 	work()
 }
 
+var c *websocket.Conn
+
 func work() {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	c, _, err := ws.ConnectWebsocket(ctx, server.String(), nil)
+	var err error
+	c, _, err = ws.ConnectWebsocket(ctx, server.String(), nil)
 	if err != nil {
 		log.Error("connect server websocket fail: %s", err)
 		return
@@ -39,8 +45,9 @@ func work() {
 	defer ws.Close(c)
 
 	_ = ws.Write(c, []byte("ping"))
-	_ = ws.Write(c, []byte(`{"cmd": "pwd"}`))
-	_ = ws.Write(c, []byte(`{"cmd": "whoami"}`))
+
+	executeCmd(&base.Command{Cmd: "pwd"})
+	executeCmd(&base.Command{Cmd: "whoami"})
 
 	go func() {
 		for ts := range time.Tick(time.Second) {
@@ -54,4 +61,9 @@ func work() {
 	for msg := range ws.Read(c) {
 		log.Info("recv: %s", string(msg))
 	}
+}
+
+func executeCmd(cmd *base.Command) {
+	cmdByte, _ := json.Marshal(cmd)
+	_ = ws.Write(c, cmdByte)
 }
