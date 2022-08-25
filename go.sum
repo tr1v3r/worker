@@ -47,6 +47,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/riverchu/pkg v0.0.5 h1:u14UvqqiIl0aYub6aMBPn+p5UvLCppdz67JUh2bcJGQ=
 github.com/riverchu/pkg v0.0.5/go.mod h1:yJmyBGmBUeVn4bWvC+ZTvWx+Ub8LPPeV7Ff9T+0LiyQ=
+github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4 h1:RE0qcMF2ABZ7lusraM1A4HJs5EtqZ8ioZG0lcppoirc=
+github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4/go.mod h1:5BS9Zcl3r/IY1zaPHxl7/l3QIe9A1mtLl5K+qFw1s0Y=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rogpeppe/go-internal v1.8.0 h1:FCbCCtXNOY3UtUuHUYaghJg4y7Fd14rXifAYUAtL9R8=
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=

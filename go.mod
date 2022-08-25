@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/gorilla/websocket v1.5.0
-	github.com/riverchu/pkg v0.0.5
+	github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4
 )
 
 require (

@@ -2,98 +2,56 @@ package main
 
 import (
 	"context"
-	"flag"
-	"net/http"
 	"net/url"
-	"os"
-	"os/signal"
 	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/riverchu/pkg/log"
+	ws "github.com/riverchu/pkg/websocket"
+
+	"github.com/riverchu/worker/config"
 )
 
-var serverAddr = flag.String("addr", "localhost:7749", "http service address")
-var interrupt = make(chan os.Signal, 1)
+const (
+	serverScheme = "ws"
+	serverAddr   = "localhost"
+	serverPath   = "/ws"
+)
+
+var server = &url.URL{Scheme: serverScheme, Host: serverAddr + ":" + config.WebServerPort(), Path: serverPath}
 
 func main() {
-	ctx := context.Background()
+	work()
+}
 
-	flag.Parse()
+func work() {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 
-	signal.Notify(interrupt, os.Interrupt)
-
-	u := url.URL{Scheme: "ws", Host: *serverAddr, Path: "/ws"}
-	log.Info("connecting to %s", u.String())
-
-	c, _, err := ConnectWebsocket(ctx, u.String(), nil)
+	c, _, err := ws.ConnectWebsocket(ctx, server.String(), nil)
 	if err != nil {
-		log.Fatal("dial:", err)
+		log.Error("connect server websocket fail: %s", err)
+		return
 	}
-	defer c.Close()
+	if c == nil {
+		log.Error("connect server websocket fail: got nil")
+		return
+	}
+	defer ws.Close(c)
 
-	Write(c, []byte("ping"))
-
-	Communicate(c, Read, Write)
-}
-
-// ConnectWebsocket connect websocket
-func ConnectWebsocket(ctx context.Context, url string, header http.Header) (*websocket.Conn, *http.Response, error) {
-	return websocket.DefaultDialer.DialContext(ctx, url, header)
-}
-
-// Communicate ...
-func Communicate(c *websocket.Conn, read func(*websocket.Conn) <-chan []byte, write func(*websocket.Conn, []byte) error) {
-	msgCh := read(c)
+	_ = ws.Write(c, []byte("ping"))
+	_ = ws.Write(c, []byte(`{"cmd": "pwd"}`))
+	_ = ws.Write(c, []byte(`{"cmd": "whoami"}`))
 
 	go func() {
-		for t := range time.Tick(time.Second) {
-			write(c, []byte(t.String()))
+		for ts := range time.Tick(time.Second) {
+			err := ws.Write(c, []byte(ts.String()))
+			if err != nil {
+				log.Error("write msg fail: %s", err)
+			}
 		}
 	}()
 
-	for {
-		select {
-		case msg, ok := <-msgCh:
-			if !ok {
-				return
-			}
-			log.Info("recv: %s", msg)
-		case <-interrupt:
-			log.Info("interrupt")
-
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Info("write close:", err)
-				return
-			}
-			select {
-			case <-msgCh:
-			case <-time.After(time.Second):
-			}
-			return
-		}
+	for msg := range ws.Read(c) {
+		log.Info("recv: %s", string(msg))
 	}
-}
-
-func Read(c *websocket.Conn) <-chan []byte {
-	msg := make(chan []byte, 64)
-	go func() {
-		defer close(msg)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				log.Info("read:", err)
-				return
-			}
-			msg <- message
-		}
-	}()
-	return msg
-}
-
-func Write(c *websocket.Conn, msg []byte) error {
-	return c.WriteMessage(websocket.TextMessage, msg)
 }
