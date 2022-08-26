@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"time"
 
@@ -44,26 +45,35 @@ func work() {
 	}
 	defer ws.Close(c)
 
-	_ = ws.Write(c, []byte("ping"))
-
-	executeCmd(&base.Command{Cmd: "pwd"})
-	executeCmd(&base.Command{Cmd: "whoami"})
-
 	go func() {
-		for ts := range time.Tick(time.Second) {
-			err := ws.Write(c, []byte(ts.String()))
-			if err != nil {
-				log.Error("write msg fail: %s", err)
-			}
+		for msg := range ws.Read(c) {
+			log.Info("recv: %s", string(msg))
 		}
 	}()
 
-	for msg := range ws.Read(c) {
-		log.Info("recv: %s", string(msg))
+	var command string
+	var args string
+	for {
+		fmt.Scanln(&command, &args)
+		if command == "" {
+			continue
+		}
+
+		log.Info("got command: %q with args: %q", command, args)
+
+		if command == "exit" {
+			return
+		}
+		if args != "" {
+			executeCmd(&base.CommandMeta{Cmd: command, Args: []string{args}})
+		} else {
+			executeCmd(&base.CommandMeta{Cmd: command})
+		}
 	}
 }
 
-func executeCmd(cmd *base.Command) {
+func executeCmd(cmd *base.CommandMeta) error {
 	cmdByte, _ := json.Marshal(cmd)
-	_ = ws.Write(c, cmdByte)
+	info, _ := json.Marshal(&base.Meta{Step: base.StepCommand, Detail: cmdByte})
+	return ws.Write(c, info)
 }

@@ -2,10 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"os/exec"
 
 	"github.com/riverchu/pkg/log"
 	"github.com/riverchu/worker/base"
+	"github.com/riverchu/worker/biz/service/command"
 )
 
 func WSHandle(msg []byte) []byte {
@@ -16,21 +16,27 @@ func WSHandle(msg []byte) []byte {
 		return msg
 	}
 
-	var cmd = new(base.Command)
-	err := json.Unmarshal(msg, cmd)
+	var meta = new(base.Meta)
+	err := json.Unmarshal(msg, meta)
 	if err != nil {
 		log.Error("unmarshal command fail: %s", err)
 		return []byte("unmarshal command fail")
 	}
 
-	return CommandExec(cmd)
+	return HandleMeta(meta)
 }
 
-func CommandExec(cmd *base.Command) []byte {
-	c := exec.Command(cmd.Cmd, cmd.Args...)
-	result, err := c.CombinedOutput()
-	if err != nil {
-		return []byte(err.Error())
+func HandleMeta(meta *base.Meta) []byte {
+	switch meta.Step {
+	case base.StepCommand:
+		result, err := command.Parse(meta.Detail)
+		if err != nil {
+			return []byte(err.Error())
+		}
+		return command.Exec(result)
+	case base.StepScan:
+		return nil
+	default:
+		return nil
 	}
-	return result
 }
