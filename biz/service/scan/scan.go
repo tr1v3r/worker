@@ -1,6 +1,7 @@
 package scan
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -26,9 +27,12 @@ func init() {
 	wm.RegisterStep(DirStep, stepRunner, TransferStep)
 	wm.RegisterStep(TransferStep, wm.TransferRunner(func(target wm.WorkTarget) {
 		conn := config.GetWSConn(target.Token())
+		if conn == nil {
+			log.Error("cannot find ws conn(%s)", target.Token())
+			return
+		}
 
 		data, _ := json.Marshal(target)
-
 		err := ws.Write(conn, data)
 		if err != nil {
 			log.Error("write to websocket fail: %s", err)
@@ -55,15 +59,11 @@ func stepRunner(work wm.Work, target wm.WorkTarget, nexts ...func(wm.WorkTarget)
 	}
 }
 
-type ScanTarget struct {
-	wm.DummyTarget
-	base.ScanMeta
-}
-
-func (t *ScanTarget) Token() string { return t.ScanMeta.TaskToken }
-
-func Recv(s *base.ScanMeta) error {
-	return wm.Recv(DirStep, &ScanTarget{ScanMeta: *s})
+func Recv(step wm.WorkStep, s *base.ScanMeta) error {
+	task := wm.NewTask(context.Background())
+	task.(*wm.Task).TaskToken = s.TaskToken
+	wm.AddTask(task)
+	return wm.Recv(step, &base.ScanTarget{ScanMeta: *s})
 }
 
 // Parse ...

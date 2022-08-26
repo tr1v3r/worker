@@ -45,6 +45,23 @@ func work() {
 	}
 	defer ws.Close(c)
 
+	log.Info("send: %s", "ping")
+	_ = ws.Write(c, []byte("ping"))
+
+	scanTarget := &base.ScanMeta{
+		Type:      string(base.StepScan),
+		TaskToken: "11f71076-9e99-4045-954d-9c2913792fdd",
+		Target:    "huolala.cn",
+	}
+	detail, _ := json.Marshal(scanTarget)
+	target := base.Meta{
+		Step:   base.StepScan,
+		Detail: detail,
+	}
+	log.Info("send target: %+v", target)
+	data, _ := json.Marshal(target)
+	_ = ws.Write(c, data)
+
 	go func() {
 		for msg := range ws.Read(c) {
 			log.Info("recv: %s", string(msg))

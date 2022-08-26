@@ -29,4 +29,13 @@ type CommandMeta struct {
 type ScanMeta struct {
 	Type      string `json:"type"`
 	TaskToken string `json:"task_token"`
+
+	Target string `json:"target"`
 }
+
+type ScanTarget struct {
+	wm.DummyTarget
+	ScanMeta
+}
+
+func (t *ScanTarget) Token() string { return t.ScanMeta.TaskToken }

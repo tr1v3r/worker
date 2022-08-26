@@ -44,7 +44,10 @@ func HandleMeta(conn *websocket.Conn, meta *base.Meta) []byte {
 			return []byte(err.Error())
 		}
 		config.SetWSConn(target.TaskToken, conn)
-		return []byte(scan.Recv(target).Error())
+		if err := scan.Recv(scan.DirStep, target); err != nil {
+			return []byte(err.Error())
+		}
+		return []byte(`{"msg": "copy that"}`)
 	default:
 		return nil
 	}
