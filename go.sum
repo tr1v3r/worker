@@ -49,8 +49,12 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4 h1:RE0qcMF2ABZ7lusraM1A4HJs5EtqZ8ioZG0lcppoirc=
 github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4/go.mod h1:5BS9Zcl3r/IY1zaPHxl7/l3QIe9A1mtLl5K+qFw1s0Y=
+github.com/riverchu/pkg v0.0.6-0.20220826101545-e8451fa882bf h1:VvEV1SukU06sicfpHt+fHCzTA+md5t9GFXUgAz5XzOU=
+github.com/riverchu/pkg v0.0.6-0.20220826101545-e8451fa882bf/go.mod h1:5BS9Zcl3r/IY1zaPHxl7/l3QIe9A1mtLl5K+qFw1s0Y=
 github.com/riverchu/workmanager v0.0.11 h1:ACUUxpBt5kung0kCGeLJH+alMXEQaVu11iNdRX+4yk0=
 github.com/riverchu/workmanager v0.0.11/go.mod h1:2P909wRFGI+BMkKPdB5r7zHJnGGn7+5q/PUWgz2MEZU=
+github.com/riverchu/workmanager v0.0.12 h1:tfgk2RjRktFbO8bUQyv1FZGrYY5ikejPja7m6hXTU7I=
+github.com/riverchu/workmanager v0.0.12/go.mod h1:2P909wRFGI+BMkKPdB5r7zHJnGGn7+5q/PUWgz2MEZU=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rogpeppe/go-internal v1.8.0 h1:FCbCCtXNOY3UtUuHUYaghJg4y7Fd14rXifAYUAtL9R8=
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=

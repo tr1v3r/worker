@@ -27,5 +27,6 @@ type CommandMeta struct {
 
 // ScanMeta ...
 type ScanMeta struct {
-	Type string `json:"type"`
+	Type      string `json:"type"`
+	TaskToken string `json:"task_token"`
 }

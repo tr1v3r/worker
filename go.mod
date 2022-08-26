@@ -5,8 +5,8 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/gorilla/websocket v1.5.0
-	github.com/riverchu/pkg v0.0.6-0.20220825112851-aa46371403d4
-	github.com/riverchu/workmanager v0.0.11
+	github.com/riverchu/pkg v0.0.6-0.20220826101545-e8451fa882bf
+	github.com/riverchu/workmanager v0.0.12
 )
 
 require (

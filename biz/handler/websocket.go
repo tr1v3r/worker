@@ -3,12 +3,16 @@ package handler
 import (
 	"encoding/json"
 
+	"github.com/gorilla/websocket"
 	"github.com/riverchu/pkg/log"
+
 	"github.com/riverchu/worker/base"
 	"github.com/riverchu/worker/biz/service/command"
+	"github.com/riverchu/worker/biz/service/scan"
+	"github.com/riverchu/worker/config"
 )
 
-func WSHandle(msg []byte) []byte {
+func WSHandle(conn *websocket.Conn, msg []byte) []byte {
 	if len(msg) == len("ping") || string(msg) == "pong" {
 		return []byte("pong")
 	}
@@ -23,19 +27,24 @@ func WSHandle(msg []byte) []byte {
 		return []byte("unmarshal command fail")
 	}
 
-	return HandleMeta(meta)
+	return HandleMeta(conn, meta)
 }
 
-func HandleMeta(meta *base.Meta) []byte {
+func HandleMeta(conn *websocket.Conn, meta *base.Meta) []byte {
 	switch meta.Step {
 	case base.StepCommand:
-		result, err := command.Parse(meta.Detail)
+		cmd, err := command.Parse(meta.Detail)
 		if err != nil {
 			return []byte(err.Error())
 		}
-		return command.Exec(result)
+		return command.Exec(cmd)
 	case base.StepScan:
-		return nil
+		target, err := scan.Parse(meta.Detail)
+		if err != nil {
+			return []byte(err.Error())
+		}
+		config.SetWSConn(target.TaskToken, conn)
+		return []byte(scan.Recv(target).Error())
 	default:
 		return nil
 	}
