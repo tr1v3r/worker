@@ -1,3 +1,3 @@
 # worker
 
-worker demo
+worker pkg
